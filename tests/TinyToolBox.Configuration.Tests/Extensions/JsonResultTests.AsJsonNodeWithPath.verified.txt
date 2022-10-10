@@ -1,0 +1,9 @@
+﻿{
+  Logging: {
+    LogLevel: {
+      Default: JsonStreamConfigurationProvider (MemoryStream),
+      Microsoft.AspNetCore: CommandLineConfigurationProvider,
+      Microsoft.Hosting.Lifetime: JsonStreamConfigurationProvider (MemoryStream)
+    }
+  }
+}

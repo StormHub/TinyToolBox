@@ -1,0 +1,7 @@
+﻿{
+  HostingOptions:Timeout: JsonStreamConfigurationProvider (MemoryStream),
+  HostingOptions:Url: CommandLineConfigurationProvider,
+  Logging:LogLevel:Default: JsonStreamConfigurationProvider (MemoryStream),
+  Logging:LogLevel:Microsoft.AspNetCore: CommandLineConfigurationProvider,
+  Logging:LogLevel:Microsoft.Hosting.Lifetime: JsonStreamConfigurationProvider (MemoryStream)
+}
