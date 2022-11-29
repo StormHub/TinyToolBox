@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
     <Description>Simple configuration source inspections through web api</Description>
-    <PackageTags>netcore;aspnetcore;Configuration;configuration provider api</PackageTags>
+    <PackageTags>netcore;aspnetcore;webapi;Configuration;configuration provider</PackageTags>
     <IsPackable>true</IsPackable>
     <PackageId>TinyToolBox.Configuration.AspNetCore</PackageId>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
