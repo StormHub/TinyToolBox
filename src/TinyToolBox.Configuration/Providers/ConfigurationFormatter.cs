@@ -59,9 +59,14 @@ internal sealed class ConfigurationFormatter
     private string FormatChained(ConfigurationKey key, ChainedConfigurationProvider chainedConfigurationProvider)
     {
         var stack = GetProviders(key, chainedConfigurationProvider);
+#if (!NETSTANDARD2_0)
+        if (stack.TryPop(out var provider))
+        {
+#else
         if (stack.Count > 0)
         {
             var provider = stack.Pop();
+#endif
             if (provider is not ChainedConfigurationProvider)
             {
                 string? result = default;
