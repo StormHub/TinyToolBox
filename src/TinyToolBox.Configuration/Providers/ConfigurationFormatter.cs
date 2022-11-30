@@ -87,13 +87,13 @@ internal sealed class ConfigurationFormatter
         return FormatDefault(chainedConfigurationProvider);
     }
 
-    private static Stack<IConfigurationProvider> GetProviders(string key, ChainedConfigurationProvider chainedConfigurationProvider)
+    private static Stack<IConfigurationProvider> GetProviders(ConfigurationKey key, ChainedConfigurationProvider chainedConfigurationProvider)
     {
-        static IConfigurationProvider? ChainOf(ChainedConfigurationProvider chained, string key) =>
+        static IConfigurationProvider? ChainOf(ConfigurationKey key, ChainedConfigurationProvider chained) =>
             chained.Configuration is IConfigurationRoot chainedRoot ? chainedRoot.GetProvider(key) : null;
 
         var stack = new Stack<IConfigurationProvider>();
-        var provider = ChainOf(chainedConfigurationProvider, key);
+        var provider = ChainOf(key, chainedConfigurationProvider);
         while (provider != null)
         {
             stack.Push(provider);
@@ -102,7 +102,7 @@ internal sealed class ConfigurationFormatter
                 break;
             }
 
-            provider = ChainOf(chained, key);
+            provider = ChainOf(key, chained);
         }
 
         return stack;
