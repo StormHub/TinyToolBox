@@ -18,7 +18,6 @@ internal sealed class ConfigurationDictionary : IEnumerable<KeyValuePair<Configu
         var hashSet = new HashSet<ConfigurationKey>(ChildrenOf(parent));
 #if NET7_0_OR_GREATER
         var list = hashSet.Order(ConfigurationKey.Comparer).ToList();
-        list.Sort(ConfigurationKey.Comparer);
 #else
         var list = hashSet.ToList();
         list.Sort(ConfigurationKey.Comparer);
