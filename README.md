@@ -13,7 +13,7 @@ It should also be noted that it is ONLY meant to provide where are the configura
 ## Example api results
 Start [example AspNetCore application](https://github.com/StormHub/TinyToolBox/tree/main/examples/Configuration/WebApi.Minimal) on development mode
 
-*Navigation to http://localhost:5000/api/configuration for all configuration values should result in the following response
+* Navigation to http://localhost:5000/api/configuration for all configuration values should result in the following response
 ```yaml
 {
     "applicationName": "MemoryConfigurationProvider (Chained:1)",
@@ -51,7 +51,7 @@ Start [example AspNetCore application](https://github.com/StormHub/TinyToolBox/t
 }
 ```
 
-*Navigation to a specific configuration node http://localhost:5000/api/configuration/Logging
+* Navigation to a specific configuration node http://localhost:5000/api/configuration/Logging
 ```yaml
 {
     "logging": {
@@ -63,7 +63,7 @@ Start [example AspNetCore application](https://github.com/StormHub/TinyToolBox/t
 }
 ```
 
-*Alternative flat style http://localhost:5000/api/configuration/Logging?style=flat
+* Alternative flat style http://localhost:5000/api/configuration/Logging?style=flat
 ```yaml
 {
     "logging:LogLevel:Default": "appsettings.Development.json (Optional)",
@@ -76,8 +76,10 @@ Start [example AspNetCore application](https://github.com/StormHub/TinyToolBox/t
 // IServiceCollection services
 services.AddConfigurationProviderOptions(options =>
 {
-    // Map configuration provider for names if needed
+    // Map configuration provider type for names if needed
     options.Map<EnvironmentVariablesConfigurationProvider>("Environment Variable");
+    // Or provider instance for names if needed
+    // options.Map<EnvironmentVariablesConfigurationProvider>(provider => provider.ToString());
 });
 ```
 This adds the custom configuration provider information, not needed for default options. 

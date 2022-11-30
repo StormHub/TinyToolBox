@@ -59,9 +59,14 @@ internal sealed class ConfigurationFormatter
     private string FormatChained(ConfigurationKey key, ChainedConfigurationProvider chainedConfigurationProvider)
     {
         var stack = GetProviders(key, chainedConfigurationProvider);
+#if (!NETSTANDARD2_0)
+        if (stack.TryPop(out var provider))
+        {
+#else
         if (stack.Count > 0)
         {
             var provider = stack.Pop();
+#endif
             if (provider is not ChainedConfigurationProvider)
             {
                 string? result = default;
@@ -82,13 +87,13 @@ internal sealed class ConfigurationFormatter
         return FormatDefault(chainedConfigurationProvider);
     }
 
-    private static Stack<IConfigurationProvider> GetProviders(string key, ChainedConfigurationProvider chainedConfigurationProvider)
+    private static Stack<IConfigurationProvider> GetProviders(ConfigurationKey key, ChainedConfigurationProvider chainedConfigurationProvider)
     {
-        static IConfigurationProvider? ChainOf(ChainedConfigurationProvider chained, string key) =>
+        static IConfigurationProvider? ChainOf(ConfigurationKey key, ChainedConfigurationProvider chained) =>
             chained.Configuration is IConfigurationRoot chainedRoot ? chainedRoot.GetProvider(key) : null;
 
         var stack = new Stack<IConfigurationProvider>();
-        var provider = ChainOf(chainedConfigurationProvider, key);
+        var provider = ChainOf(key, chainedConfigurationProvider);
         while (provider != null)
         {
             stack.Push(provider);
@@ -97,26 +102,22 @@ internal sealed class ConfigurationFormatter
                 break;
             }
 
-            provider = ChainOf(chained, key);
+            provider = ChainOf(key, chained);
         }
 
         return stack;
     }
 
-    private static string FormatDefault(IConfigurationProvider provider)
-    {
-        // Abstract types
-        if (provider is FileConfigurationProvider file)
+    private static string FormatDefault(IConfigurationProvider provider) =>
+        provider switch
         {
-            return $"{file.Source.Path} ({(file.Source.Optional ? "Optional" : "Required")})";
-        }
-        if (provider is StreamConfigurationProvider stream)
-        {
-            return $"{FallbackFormatter(provider)} ({stream.Source.Stream!.GetType().Name})";
-        }
+            // Abstract types
+            FileConfigurationProvider file => $"{file.Source.Path} ({(file.Source.Optional ? "Optional" : "Required")})",
+            StreamConfigurationProvider stream => $"{FallbackFormatter(provider)} ({stream.Source.Stream!.GetType().Name})",
 
-        return FallbackFormatter(provider);
-    }
+            // Default
+            _ => FallbackFormatter(provider),
+        };
 
     private static string FallbackFormatter(IConfigurationProvider provider) => 
         provider.ToString() ?? provider.GetType().Name;
