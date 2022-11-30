@@ -12,12 +12,10 @@ internal sealed class ConfigurationFilter
     public ConfigurationFilter() 
         : this(new [] 
               {
-                 // No top level environment variables
                  new KeyValuePair<Type, Func<KeyValuePair<ConfigurationKey, IConfigurationProvider>, bool>>(
-                     typeof(EnvironmentVariablesConfigurationProvider), (pair) => pair.Key.Depth() > 1)
+                     typeof(EnvironmentVariablesConfigurationProvider), NoTopLevelEnvironmentVariables)
               })
-    {
-    }
+    { }
 
     public ConfigurationFilter(IEnumerable<KeyValuePair<Type, Func<KeyValuePair<ConfigurationKey, IConfigurationProvider>, bool>>> filters)
     {
@@ -26,5 +24,11 @@ internal sealed class ConfigurationFilter
 
     public IEnumerable<KeyValuePair<ConfigurationKey, IConfigurationProvider>> Apply(
         IEnumerable<KeyValuePair<ConfigurationKey, IConfigurationProvider>> source) => 
-            source.Where(pair => _filters.Where(x => x.Key.IsAssignableFrom(pair.Value.GetType())).All(x => x.Value.Invoke(pair)));
+            source.Where(pair => 
+                _filters
+                    .Where(x => x.Key.IsAssignableFrom(pair.Value.GetType()))
+                    .All(filter => filter.Value.Invoke(pair)));
+
+    private static bool NoTopLevelEnvironmentVariables(KeyValuePair<ConfigurationKey, IConfigurationProvider> pair) =>
+        pair.Value is EnvironmentVariablesConfigurationProvider && pair.Key.Depth() > 1;
 }

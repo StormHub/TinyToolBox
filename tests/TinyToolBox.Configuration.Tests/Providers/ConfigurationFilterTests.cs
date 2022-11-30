@@ -1,9 +1,9 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.CommandLine;
 using Microsoft.Extensions.Configuration.Memory;
 using TinyToolBox.Configuration.Keys;
 using TinyToolBox.Configuration.Providers;
+using FluentAssertions;
 
 namespace TinyToolBox.Configuration.Tests.Providers;
 
