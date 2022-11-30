@@ -63,7 +63,7 @@ Start [example AspNetCore application](https://github.com/StormHub/TinyToolBox/t
 }
 ```
 
-*Alternative flat style http://localhost:5000/api/configuration/Logging?style=flat
+* Alternative flat style http://localhost:5000/api/configuration/Logging?style=flat
 ```yaml
 {
     "logging:LogLevel:Default": "appsettings.Development.json (Optional)",
