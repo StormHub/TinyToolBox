@@ -108,20 +108,16 @@ internal sealed class ConfigurationFormatter
         return stack;
     }
 
-    private static string FormatDefault(IConfigurationProvider provider)
-    {
-        // Abstract types
-        if (provider is FileConfigurationProvider file)
+    private static string FormatDefault(IConfigurationProvider provider) =>
+        provider switch
         {
-            return $"{file.Source.Path} ({(file.Source.Optional ? "Optional" : "Required")})";
-        }
-        if (provider is StreamConfigurationProvider stream)
-        {
-            return $"{FallbackFormatter(provider)} ({stream.Source.Stream!.GetType().Name})";
-        }
+            // Abstract types
+            FileConfigurationProvider file => $"{file.Source.Path} ({(file.Source.Optional ? "Optional" : "Required")})",
+            StreamConfigurationProvider stream => $"{FallbackFormatter(provider)} ({stream.Source.Stream!.GetType().Name})",
 
-        return FallbackFormatter(provider);
-    }
+            // Default
+            _ => FallbackFormatter(provider),
+        };
 
     private static string FallbackFormatter(IConfigurationProvider provider) => 
         provider.ToString() ?? provider.GetType().Name;
