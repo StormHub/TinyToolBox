@@ -15,15 +15,17 @@ internal sealed class ConfigurationDictionary : IEnumerable<KeyValuePair<Configu
 
     public IReadOnlyList<ConfigurationKey> GetChildKeys(ConfigurationKey parent)
     {
-        var hashSet = new HashSet<ConfigurationKey>(ChildrenOf(parent));
 #if NET7_0_OR_GREATER
-        var list = hashSet.Order(ConfigurationKey.Comparer).ToList();
+        return ChildrenOf(parent)
+            .ToHashSet()
+            .Order(ConfigurationKey.Comparer)
+            .ToList();
 #else
+        var hashSet = new HashSet<ConfigurationKey>(ChildrenOf(parent));
         var list = hashSet.ToList();
         list.Sort(ConfigurationKey.Comparer);
-#endif
-
         return list;
+#endif
     }
 
     private IEnumerable<ConfigurationKey> ChildrenOf(ConfigurationKey parent)

@@ -72,7 +72,7 @@ internal sealed class ConfigurationFormatter
                 string? result = default;
                 if (_mappings.TryGetValue(provider.GetType(), out var formatter))
                 {
-                    result = formatter(provider);
+                    result = formatter.Invoke(provider);
                 }
 
                 if (string.IsNullOrEmpty(result))
