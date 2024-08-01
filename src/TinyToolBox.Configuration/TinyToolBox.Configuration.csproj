@@ -7,7 +7,7 @@
         <PackageId>TinyToolBox.Configuration</PackageId>
         <IsPackable>true</IsPackable>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <Version>0.4</Version>
+        <Version>0.5</Version>
     </PropertyGroup>
 
     <ItemGroup>
