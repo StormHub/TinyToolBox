@@ -7,7 +7,7 @@ internal sealed class ConfigurationFormatter
 {
     private readonly Dictionary<Type, Func<IConfigurationProvider, string>> _mappings;
 
-    public ConfigurationFormatter() 
+    public ConfigurationFormatter()
     {
         _mappings = new Dictionary<Type, Func<IConfigurationProvider, string>>();
     }
@@ -18,13 +18,9 @@ internal sealed class ConfigurationFormatter
 
 #if (NETSTANDARD2_0)
         if (!_mappings.ContainsKey(typeof(T)))
-        {
             _mappings.Add(typeof(T), mapping);
-        }
-        else 
-        {
+        else
             _mappings[typeof(T)] = mapping;
-        }
 #else
         if (!_mappings.TryAdd(typeof(T), mapping))
         {
@@ -33,7 +29,10 @@ internal sealed class ConfigurationFormatter
 #endif
     }
 
-    public string Format(KeyValuePair<ConfigurationKey, IConfigurationProvider> pair) => Format(pair.Key, pair.Value);
+    public string Format(KeyValuePair<ConfigurationKey, IConfigurationProvider> pair)
+    {
+        return Format(pair.Key, pair.Value);
+    }
 
     public string Format(ConfigurationKey key, IConfigurationProvider provider)
     {
@@ -41,17 +40,11 @@ internal sealed class ConfigurationFormatter
         if (_mappings.TryGetValue(provider.GetType(), out var formatter))
         {
             var result = formatter.Invoke(provider);
-            if (!string.IsNullOrEmpty(result))
-            {
-                return result;
-            }
+            if (!string.IsNullOrEmpty(result)) return result;
         }
 
         // Chained
-        if (provider is ChainedConfigurationProvider chained)
-        {
-            return FormatChained(key, chained);
-        }
+        if (provider is ChainedConfigurationProvider chained) return FormatChained(key, chained);
 
         return FormatDefault(provider);
     }
@@ -70,15 +63,9 @@ internal sealed class ConfigurationFormatter
             if (provider is not ChainedConfigurationProvider)
             {
                 string? result = default;
-                if (_mappings.TryGetValue(provider.GetType(), out var formatter))
-                {
-                    result = formatter.Invoke(provider);
-                }
+                if (_mappings.TryGetValue(provider.GetType(), out var formatter)) result = formatter.Invoke(provider);
 
-                if (string.IsNullOrEmpty(result))
-                {
-                    result = FormatDefault(provider);
-                }
+                if (string.IsNullOrEmpty(result)) result = FormatDefault(provider);
 
                 return $"{result} (Chained:{stack.Count + 1})";
             }
@@ -87,20 +74,21 @@ internal sealed class ConfigurationFormatter
         return FormatDefault(chainedConfigurationProvider);
     }
 
-    private static Stack<IConfigurationProvider> GetProviders(ConfigurationKey key, ChainedConfigurationProvider chainedConfigurationProvider)
+    private static Stack<IConfigurationProvider> GetProviders(
+        ConfigurationKey key,
+        ChainedConfigurationProvider chainedConfigurationProvider)
     {
-        static IConfigurationProvider? ChainOf(ConfigurationKey key, ChainedConfigurationProvider chained) =>
-            chained.Configuration is IConfigurationRoot chainedRoot ? chainedRoot.GetProvider(key) : null;
+        static IConfigurationProvider? ChainOf(ConfigurationKey key, ChainedConfigurationProvider chained)
+        {
+            return chained.Configuration is IConfigurationRoot chainedRoot ? chainedRoot.GetProvider(key) : null;
+        }
 
         var stack = new Stack<IConfigurationProvider>();
         var provider = ChainOf(key, chainedConfigurationProvider);
         while (provider != null)
         {
             stack.Push(provider);
-            if (provider is not ChainedConfigurationProvider chained)
-            {
-                break;
-            }
+            if (provider is not ChainedConfigurationProvider chained) break;
 
             provider = ChainOf(key, chained);
         }
@@ -108,17 +96,23 @@ internal sealed class ConfigurationFormatter
         return stack;
     }
 
-    private static string FormatDefault(IConfigurationProvider provider) =>
-        provider switch
+    private static string FormatDefault(IConfigurationProvider provider)
+    {
+        return provider switch
         {
             // Abstract types
-            FileConfigurationProvider file => $"{file.Source.Path} ({(file.Source.Optional ? "Optional" : "Required")})",
-            StreamConfigurationProvider stream => $"{FallbackFormatter(provider)} ({stream.Source.Stream!.GetType().Name})",
+            FileConfigurationProvider file =>
+                $"{file.Source.Path} ({(file.Source.Optional ? "Optional" : "Required")})",
+            StreamConfigurationProvider stream =>
+                $"{FallbackFormatter(provider)} ({stream.Source.Stream!.GetType().Name})",
 
             // Default
-            _ => FallbackFormatter(provider),
+            _ => FallbackFormatter(provider)
         };
+    }
 
-    private static string FallbackFormatter(IConfigurationProvider provider) => 
-        provider.ToString() ?? provider.GetType().Name;
+    private static string FallbackFormatter(IConfigurationProvider provider)
+    {
+        return provider.ToString() ?? provider.GetType().Name;
+    }
 }

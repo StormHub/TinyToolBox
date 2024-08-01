@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.CommandLine;
 using Microsoft.Extensions.Configuration.Memory;
 using TinyToolBox.Configuration.Keys;
 using TinyToolBox.Configuration.Providers;
-using FluentAssertions;
 
 namespace TinyToolBox.Configuration.Tests.Providers;
 
@@ -23,10 +23,10 @@ public sealed class ConfigurationFilterTests
                     new KeyValuePair<string, string?>("2", null)
                 })
             .AddCommandLine(new[]
-                {
-                    $"2:1:1=2-1-1",
-                    $"3=3"
-                })
+            {
+                "2:1:1=2-1-1",
+                "3=3"
+            })
             .Build();
     }
 
@@ -39,8 +39,8 @@ public sealed class ConfigurationFilterTests
         var configurationFilter = new ConfigurationFilter(
             new Dictionary<Type, Func<KeyValuePair<ConfigurationKey, IConfigurationProvider>, bool>>
             {
-                { typeof(MemoryConfigurationProvider), (pair) => pair.Key.Path.StartsWith("1:2") },
-                { typeof(CommandLineConfigurationProvider), (pair) => pair.Key.Path == "3" },
+                { typeof(MemoryConfigurationProvider), pair => pair.Key.Path.StartsWith("1:2") },
+                { typeof(CommandLineConfigurationProvider), pair => pair.Key.Path == "3" }
             });
         var result = configurationFilter.Apply(_configurationRoot.Enumerate()).ToArray();
 
@@ -51,7 +51,7 @@ public sealed class ConfigurationFilterTests
                     new ConfigurationKey("1:2:1"), memoryProvider),
                 new KeyValuePair<ConfigurationKey, IConfigurationProvider>(
                     new ConfigurationKey("1:2"), memoryProvider),
-                new KeyValuePair<ConfigurationKey, IConfigurationProvider>( 
+                new KeyValuePair<ConfigurationKey, IConfigurationProvider>(
                     new ConfigurationKey("1:2:3"), memoryProvider),
                 new KeyValuePair<ConfigurationKey, IConfigurationProvider>(
                     new ConfigurationKey("3"), commandLineProvider)
@@ -83,6 +83,6 @@ public sealed class ConfigurationFilterTests
                     new ConfigurationKey("2:1:1"), commandLineProvider),
                 new KeyValuePair<ConfigurationKey, IConfigurationProvider>(
                     new ConfigurationKey("3"), commandLineProvider)
-        });
+            });
     }
 }

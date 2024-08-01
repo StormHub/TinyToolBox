@@ -1,5 +1,5 @@
-﻿using TinyToolBox.Configuration.Keys;
-using FluentAssertions;
+﻿using FluentAssertions;
+using TinyToolBox.Configuration.Keys;
 
 namespace TinyToolBox.Configuration.Tests.Keys;
 
@@ -35,26 +35,15 @@ public sealed class ConfigurationKeyTests
     {
         var key = ConfigurationKey.Empty;
         var segments = key.GetSegments();
-        segments.Should().BeEquivalentTo(new[]
-        {
-            ""
-        });
+        segments.Should().BeEquivalentTo("");
 
         key = new ConfigurationKey("1");
         segments = key.GetSegments();
-        segments.Should().BeEquivalentTo(new[]
-        {
-            "1"
-        });
+        segments.Should().BeEquivalentTo("1");
 
         key = new ConfigurationKey("1:2:3");
         segments = key.GetSegments();
-        segments.Should().BeEquivalentTo(new[]
-        {
-            "1",
-            "2",
-            "3"
-        });
+        segments.Should().BeEquivalentTo("1", "2", "3");
     }
 
     [Theory]
@@ -70,13 +59,9 @@ public sealed class ConfigurationKeyTests
 
         var child = key.ChildOf((ConfigurationKey)parent);
         if (expected is null)
-        {
             child.Should().BeNull();
-        }
         else
-        {
             child!.Value.Should().Be((ConfigurationKey)expected);
-        }
     }
 
     [Theory]

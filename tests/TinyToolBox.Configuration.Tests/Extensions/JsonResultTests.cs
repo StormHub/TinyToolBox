@@ -3,21 +3,20 @@ using TinyToolBox.Configuration.Extensions;
 
 namespace TinyToolBox.Configuration.Tests.Extensions;
 
-[UsesVerify]
 public sealed class JsonResultTests : IDisposable
 {
     private readonly IConfigurationRoot _configurationRoot;
     private readonly MemoryStream _memoryStream;
 
-    public JsonResultTests() 
+    public JsonResultTests()
     {
         var builder = new ConfigurationBuilder()
             .AddInMemoryCollection(new[]
-                {
-                    new KeyValuePair<string, string?>("Logging:LogLevel:Microsoft.AspNetCore", "Debug"),
-                    new KeyValuePair<string, string?>("HostingOptions:Timeout", "10"),
-                    new KeyValuePair<string, string?>("HostingOptions:Url", "http://development"),
-                })
+            {
+                new KeyValuePair<string, string?>("Logging:LogLevel:Microsoft.AspNetCore", "Debug"),
+                new KeyValuePair<string, string?>("HostingOptions:Timeout", "10"),
+                new KeyValuePair<string, string?>("HostingOptions:Url", "http://development")
+            })
             .AddJsonStream(StreamExtensions.Text(
                 @"{
                     ""Logging"" : { 
@@ -32,13 +31,18 @@ public sealed class JsonResultTests : IDisposable
                     }
                 }"))
             .AddCommandLine(new[]
-                {
-                    $"Logging:LogLevel:Microsoft.AspNetCore=Error",
-                    $"HostingOptions:Url=http://production",
-                });
+            {
+                "Logging:LogLevel:Microsoft.AspNetCore=Error",
+                "HostingOptions:Url=http://production"
+            });
 
         _configurationRoot = builder.Build();
         _memoryStream = new MemoryStream();
+    }
+
+    public void Dispose()
+    {
+        _memoryStream.Dispose();
     }
 
     [Fact]
@@ -100,6 +104,4 @@ public sealed class JsonResultTests : IDisposable
         var content = await _memoryStream.ReadAsString();
         await VerifyJson(content);
     }
-
-    public void Dispose() => _memoryStream.Dispose();
 }

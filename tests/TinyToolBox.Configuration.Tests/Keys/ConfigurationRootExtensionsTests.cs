@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.CommandLine;
 using Microsoft.Extensions.Configuration.Memory;
 using TinyToolBox.Configuration.Keys;
-using FluentAssertions;
 
 namespace TinyToolBox.Configuration.Tests.Keys;
 
@@ -10,7 +10,7 @@ public sealed class ConfigurationRootExtensionsTests
 {
     private readonly IConfigurationRoot _configurationRoot;
 
-    public ConfigurationRootExtensionsTests() 
+    public ConfigurationRootExtensionsTests()
     {
         var chained = new ConfigurationBuilder()
             .AddConfiguration(
@@ -30,12 +30,12 @@ public sealed class ConfigurationRootExtensionsTests
                 {
                     new KeyValuePair<string, string?>("1", "1"),
                     new KeyValuePair<string, string?>("2", "2-1"),
-                    new KeyValuePair<string, string?>("3", "3-1"),
+                    new KeyValuePair<string, string?>("3", "3-1")
                 })
             .AddCommandLine(new[]
-                {
-                    $"2=2-2"
-                })
+            {
+                "2=2-2"
+            })
             .AddJsonStream(StreamExtensions.Text(@"{ ""3"" : ""3-2"" }"))
             .AddConfiguration(chained)
             .Build();
@@ -48,7 +48,7 @@ public sealed class ConfigurationRootExtensionsTests
             { "1", typeof(MemoryConfigurationProvider) },
             { "2", typeof(CommandLineConfigurationProvider) },
             { "3", typeof(ChainedConfigurationProvider) },
-            { "4:1", typeof(ChainedConfigurationProvider) },
+            { "4:1", typeof(ChainedConfigurationProvider) }
         };
 
         return theoryData;

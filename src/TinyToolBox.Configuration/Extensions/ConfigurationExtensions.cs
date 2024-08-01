@@ -29,7 +29,7 @@ public static class ConfigurationExtensions
         var root = new JsonObject();
         var queue = new Queue<ConfigurationKey>(new[] { ConfigurationKey.Empty });
 
-#if (!NETSTANDARD2_0) 
+#if (!NETSTANDARD2_0)
         while (queue.TryDequeue(out var key))
         {
 #else
@@ -42,29 +42,18 @@ public static class ConfigurationExtensions
 
             var current = root;
             var keys = key.GetSegments();
-            for(var i = 0; i < keys.Length - 1; i++)
-            {
-                current = current[keys[i]]!.AsObject();
-            }
+            for (var i = 0; i < keys.Length - 1; i++) current = current[keys[i]]!.AsObject();
 
             var children = configurationDictionary.GetChildKeys(key);
             if (children.Count == 0)
             {
                 if (configurationDictionary.TryGetValue(key, out var provider))
-                {
                     current.Add(name, options.Formatter.Format(key, provider!));
-                }
                 continue;
             }
 
-            if (name.Length > 0)
-            {
-                current.Add(name, new JsonObject());
-            }
-            foreach (var child in children)
-            {
-                queue.Enqueue(child);
-            }
+            if (name.Length > 0) current.Add(name, new JsonObject());
+            foreach (var child in children) queue.Enqueue(child);
         }
 
         return root;

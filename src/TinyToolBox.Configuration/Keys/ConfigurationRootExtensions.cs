@@ -6,8 +6,8 @@ namespace TinyToolBox.Configuration.Keys;
 internal static class ConfigurationRootExtensions
 {
     internal static ConfigurationDictionary AsDictionary(
-        this IConfigurationRoot configurationRoot, 
-        string[]? segments = null, 
+        this IConfigurationRoot configurationRoot,
+        string[]? segments = null,
         ConfigurationFilter? filter = null)
     {
         var pathSegments = segments?.Where(x => !string.IsNullOrEmpty(x)).ToArray();
@@ -15,7 +15,9 @@ internal static class ConfigurationRootExtensions
 
         return new(filter.Apply(
             configurationRoot.Enumerate(
-                pathSegments?.Any() ?? false ? configurationRoot.GetSection(ConfigurationPath.Combine(pathSegments)) : null)));
+                pathSegments?.Any() ?? false
+                    ? configurationRoot.GetSection(ConfigurationPath.Combine(pathSegments))
+                    : null)));
     }
 
     internal static IEnumerable<KeyValuePair<ConfigurationKey, IConfigurationProvider>> Enumerate(
@@ -29,21 +31,16 @@ internal static class ConfigurationRootExtensions
             var configurationSection = configurationRoot.GetSection(pair.Key);
             var provider = configurationRoot.GetProvider(configurationSection.Path);
             if (provider != null)
-            {
-                yield return new KeyValuePair<ConfigurationKey, IConfigurationProvider>(configurationSection.Path, provider);
-            }
+                yield return new KeyValuePair<ConfigurationKey, IConfigurationProvider>(configurationSection.Path,
+                    provider);
         }
     }
 
     internal static IConfigurationProvider? GetProvider(this IConfigurationRoot configurationRoot, string key)
     {
         foreach (var provider in configurationRoot.Providers.Reverse())
-        {
             if (provider.TryGet(key, out _))
-            {
                 return provider;
-            }
-        }
 
         return null;
     }

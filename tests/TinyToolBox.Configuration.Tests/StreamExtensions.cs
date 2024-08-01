@@ -28,19 +28,13 @@ internal static class StreamExtensions
 
         var fileName = Path.GetFileNameWithoutExtension(testFilePath);
         var name = $"{fileName}";
-        if (key != null)
-        {
-            name += $"-{key}";
-        }
+        if (key != null) name += $"-{key}";
 
         var paths = new List<string>
         {
             directoryName
         };
-        if (!string.IsNullOrEmpty(folder))
-        {
-            paths.Add(folder);
-        }
+        if (!string.IsNullOrEmpty(folder)) paths.Add(folder);
         paths.Add($"{name}.json");
 
         var fullPath = Path.Combine(paths.ToArray());

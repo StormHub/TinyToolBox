@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TinyToolBox.Configuration.Extensions;
 using TinyToolBox.Configuration.Providers;
-
 #if (!NETSTANDARD2_0)
 using Microsoft.AspNetCore.Http.Json;
 #endif
@@ -21,10 +20,8 @@ internal static class HttpContextExtensions
         JsonSerializerOptions? serializerOptions,
         CancellationToken cancellationToken)
     {
-        if (httpContext.RequestServices.GetRequiredService<IConfiguration>() is not IConfigurationRoot configurationRoot)
-        {
-            return;
-        }
+        if (httpContext.RequestServices
+                .GetRequiredService<IConfiguration>() is not IConfigurationRoot configurationRoot) return;
 
 #if NETSTANDARD2_0
         var segments = path?.Split('/').Where(x => !string.IsNullOrEmpty(x)).ToArray();
@@ -33,10 +30,7 @@ internal static class HttpContextExtensions
 #endif
 
         var formatStyle = FormatStyle.Default;
-        if (Enum.TryParse<FormatStyle>(style, ignoreCase: true, out var value))
-        {
-            formatStyle = value;
-        }
+        if (Enum.TryParse<FormatStyle>(style, true, out var value)) formatStyle = value;
 
 #if (!NETSTANDARD2_0)
         serializerOptions ??= httpContext.RequestServices.GetService<IOptions<JsonOptions>>()?.Value?.SerializerOptions

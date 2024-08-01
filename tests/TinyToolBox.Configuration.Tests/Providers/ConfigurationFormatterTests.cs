@@ -1,18 +1,18 @@
-﻿using Microsoft.Extensions.Configuration.Memory;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.CommandLine;
 using Microsoft.Extensions.Configuration.Json;
-using TinyToolBox.Configuration.Providers;
+using Microsoft.Extensions.Configuration.Memory;
 using TinyToolBox.Configuration.Keys;
-using FluentAssertions;
+using TinyToolBox.Configuration.Providers;
 
 namespace TinyToolBox.Configuration.Tests.Providers;
 
 public sealed class ConfigurationFormatterTests
 {
     private readonly IConfigurationRoot _chainedRoot;
-    private readonly IConfigurationRoot _configurationRoot;
     private readonly ConfigurationFormatter _configurationFormatter;
+    private readonly IConfigurationRoot _configurationRoot;
 
     public ConfigurationFormatterTests()
     {
@@ -20,7 +20,7 @@ public sealed class ConfigurationFormatterTests
         var chainedPath = StreamExtensions.JsonFilePath("files", "Chained");
 
         _chainedRoot = new ConfigurationBuilder()
-            .AddJsonFile(chainedPath, optional: true)
+            .AddJsonFile(chainedPath, true)
             .Build();
 
         var chained = new ConfigurationBuilder()
@@ -42,11 +42,11 @@ public sealed class ConfigurationFormatterTests
                     new KeyValuePair<string, string?>("1", "1")
                 })
             .AddCommandLine(new[]
-                {
-                    $"2=2"
-                })
+            {
+                "2=2"
+            })
             .AddJsonStream(StreamExtensions.Text(@"{ ""3"" : ""3"" }"))
-            .AddJsonFile(path, optional: false)
+            .AddJsonFile(path, false)
             .AddConfiguration(chained)
             .Build();
 
@@ -60,7 +60,8 @@ public sealed class ConfigurationFormatterTests
 
         _configurationFormatter.Format("2", commandLineProvider)
             .Should().Be($"{nameof(CommandLineConfigurationProvider)}");
-        _configurationFormatter.Format(new KeyValuePair<ConfigurationKey, IConfigurationProvider>("2", commandLineProvider))
+        _configurationFormatter
+            .Format(new KeyValuePair<ConfigurationKey, IConfigurationProvider>("2", commandLineProvider))
             .Should().Be($"{nameof(CommandLineConfigurationProvider)}");
     }
 
@@ -73,7 +74,7 @@ public sealed class ConfigurationFormatterTests
         _configurationFormatter.Format("4", jsonProvider)
             .Should().Be($"{jsonProvider.Source.Path} (Required)");
         _configurationFormatter.Format(new KeyValuePair<ConfigurationKey, IConfigurationProvider>("4", jsonProvider))
-        .Should().Be($"{jsonProvider.Source.Path} (Required)");
+            .Should().Be($"{jsonProvider.Source.Path} (Required)");
 
         // Override
         _configurationFormatter.Add<JsonConfigurationProvider>(_ => "MyJsonProvider");
@@ -111,7 +112,8 @@ public sealed class ConfigurationFormatterTests
         // Default
         _configurationFormatter.Format("5:1", chainedProvider)
             .Should().Be($"{nameof(MemoryConfigurationProvider)} (Chained:2)");
-        _configurationFormatter.Format(new KeyValuePair<ConfigurationKey, IConfigurationProvider>("5:1", chainedProvider))
+        _configurationFormatter
+            .Format(new KeyValuePair<ConfigurationKey, IConfigurationProvider>("5:1", chainedProvider))
             .Should().Be($"{nameof(MemoryConfigurationProvider)} (Chained:2)");
 
         // Chained to default
@@ -124,7 +126,8 @@ public sealed class ConfigurationFormatterTests
         _configurationFormatter.Add<ChainedConfigurationProvider>(_ => "MyChainedProvider");
         _configurationFormatter.Format("5:1", chainedProvider)
             .Should().Be("MyChainedProvider");
-        _configurationFormatter.Format(new KeyValuePair<ConfigurationKey, IConfigurationProvider>("5:1", chainedProvider))
+        _configurationFormatter
+            .Format(new KeyValuePair<ConfigurationKey, IConfigurationProvider>("5:1", chainedProvider))
             .Should().Be("MyChainedProvider");
     }
 

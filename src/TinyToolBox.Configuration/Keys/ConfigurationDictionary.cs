@@ -13,6 +13,23 @@ internal sealed class ConfigurationDictionary : IEnumerable<KeyValuePair<Configu
         _keyDictionary = keyValuePairs.ToImmutableDictionary();
     }
 
+    public IEnumerator<KeyValuePair<ConfigurationKey, IConfigurationProvider>> GetEnumerator()
+    {
+#if NET7_0_OR_GREATER
+        var keys = _keyDictionary.Keys.Order(ConfigurationKey.Comparer).ToList();
+#else
+        var keys = _keyDictionary.Keys.ToList();
+        keys.Sort(ConfigurationKey.Comparer);
+#endif
+        foreach (var key in keys)
+            yield return new KeyValuePair<ConfigurationKey, IConfigurationProvider>(key, _keyDictionary[key]);
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
     public IReadOnlyList<ConfigurationKey> GetChildKeys(ConfigurationKey parent)
     {
 #if NET7_0_OR_GREATER
@@ -31,30 +48,12 @@ internal sealed class ConfigurationDictionary : IEnumerable<KeyValuePair<Configu
     private IEnumerable<ConfigurationKey> ChildrenOf(ConfigurationKey parent)
     {
         foreach (var key in _keyDictionary.Keys.Select(x => x.ChildOf(parent)))
-        {
             if (key.HasValue)
-            {
                 yield return key.Value;
-            }
-        }
     }
 
-    public bool TryGetValue(ConfigurationKey key, out IConfigurationProvider? provider) => 
-        _keyDictionary.TryGetValue(key, out provider);
-
-    public IEnumerator<KeyValuePair<ConfigurationKey, IConfigurationProvider>> GetEnumerator()
+    public bool TryGetValue(ConfigurationKey key, out IConfigurationProvider? provider)
     {
-#if NET7_0_OR_GREATER
-        var keys = _keyDictionary.Keys.Order(ConfigurationKey.Comparer).ToList();
-#else
-        var keys = _keyDictionary.Keys.ToList();
-        keys.Sort(ConfigurationKey.Comparer);
-#endif
-        foreach (var key in keys)
-        {
-            yield return new KeyValuePair<ConfigurationKey, IConfigurationProvider>(key, _keyDictionary[key]);
-        }
+        return _keyDictionary.TryGetValue(key, out provider);
     }
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

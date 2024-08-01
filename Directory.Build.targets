@@ -1,5 +1,5 @@
 <Project>
-  <PropertyGroup>
-    <InformationalVersion>$(Version)-$(GitHeadSha)</InformationalVersion>
-  </PropertyGroup>
+    <PropertyGroup>
+        <InformationalVersion>$(Version)-$(GitHeadSha)</InformationalVersion>
+    </PropertyGroup>
 </Project>

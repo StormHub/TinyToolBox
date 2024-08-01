@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Memory;
 using TinyToolBox.Configuration.Keys;
-using FluentAssertions;
 
 namespace TinyToolBox.Configuration.Tests.Keys;
 
@@ -18,7 +18,7 @@ public sealed class ConfigurationDictionaryTests
                     new KeyValuePair<string, string?>("1:2:1", "1-2-1"),
                     new KeyValuePair<string, string?>("1:2", "1-2"),
                     new KeyValuePair<string, string?>("1:2:3", "1-2-3"),
-                    new KeyValuePair<string, string?>("2", null),
+                    new KeyValuePair<string, string?>("2", null)
                 })
             .Build();
         _keyDictionary = configurationRoot.AsDictionary();
@@ -48,15 +48,15 @@ public sealed class ConfigurationDictionaryTests
         childKeys.Should().BeEquivalentTo(expected.Select(x => new ConfigurationKey(x)).ToArray());
     }
 
-    public static TheoryData<string, bool?> TryGetValueCases()
+    public static TheoryData<string, bool> TryGetValueCases()
     {
-        var theoryData = new TheoryData<string, bool?>
+        var theoryData = new TheoryData<string, bool>
         {
-            { "" , false },
-            { "1" , false },
+            { "", false },
+            { "1", false },
             { "2", true },
             { "3", false },
-            { "1:2", true },
+            { "1:2", true }
         };
 
         return theoryData;
@@ -67,9 +67,6 @@ public sealed class ConfigurationDictionaryTests
     public void TryGetValue(string key, bool exists)
     {
         _keyDictionary.TryGetValue(key, out var actual).Should().Be(exists);
-        if (exists)
-        {
-            actual.Should().BeOfType<MemoryConfigurationProvider>();
-        }
+        if (exists) actual.Should().BeOfType<MemoryConfigurationProvider>();
     }
 }
