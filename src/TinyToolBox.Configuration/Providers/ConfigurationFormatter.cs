@@ -5,12 +5,7 @@ namespace TinyToolBox.Configuration.Providers;
 
 internal sealed class ConfigurationFormatter
 {
-    private readonly Dictionary<Type, Func<IConfigurationProvider, string>> _mappings;
-
-    public ConfigurationFormatter()
-    {
-        _mappings = new Dictionary<Type, Func<IConfigurationProvider, string>>();
-    }
+    private readonly Dictionary<Type, Func<IConfigurationProvider, string>> _mappings = new();
 
     public void Add<T>(Func<T, string> formatter) where T : IConfigurationProvider
     {
@@ -29,10 +24,7 @@ internal sealed class ConfigurationFormatter
 #endif
     }
 
-    public string Format(KeyValuePair<ConfigurationKey, IConfigurationProvider> pair)
-    {
-        return Format(pair.Key, pair.Value);
-    }
+    public string Format(KeyValuePair<ConfigurationKey, IConfigurationProvider> pair) => Format(pair.Key, pair.Value);
 
     public string Format(ConfigurationKey key, IConfigurationProvider provider)
     {
@@ -111,8 +103,5 @@ internal sealed class ConfigurationFormatter
         };
     }
 
-    private static string FallbackFormatter(IConfigurationProvider provider)
-    {
-        return provider.ToString() ?? provider.GetType().Name;
-    }
+    private static string FallbackFormatter(IConfigurationProvider provider) => provider.ToString() ?? provider.GetType().Name;
 }

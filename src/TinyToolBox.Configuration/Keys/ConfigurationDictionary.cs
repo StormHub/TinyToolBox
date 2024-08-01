@@ -52,8 +52,5 @@ internal sealed class ConfigurationDictionary : IEnumerable<KeyValuePair<Configu
                 yield return key.Value;
     }
 
-    public bool TryGetValue(ConfigurationKey key, out IConfigurationProvider? provider)
-    {
-        return _keyDictionary.TryGetValue(key, out provider);
-    }
+    public bool TryGetValue(ConfigurationKey key, out IConfigurationProvider? provider) => _keyDictionary.TryGetValue(key, out provider);
 }
