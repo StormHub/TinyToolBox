@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;net6.0;net7.0;net8.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
         <Description>Simple configuration source inspections through web api</Description>
         <PackageTags>netcore;aspnetcore;webapi;Configuration;configuration provider</PackageTags>
         <IsPackable>true</IsPackable>
         <PackageId>TinyToolBox.Configuration.AspNetCore</PackageId>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <Version>0.5</Version>
+        <Version>0.6</Version>
     </PropertyGroup>
 
     <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
     </ItemGroup>
 
     <ItemGroup>

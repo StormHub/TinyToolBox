@@ -15,13 +15,7 @@ internal sealed class ConfigurationDictionary : IEnumerable<KeyValuePair<Configu
 
     public IEnumerator<KeyValuePair<ConfigurationKey, IConfigurationProvider>> GetEnumerator()
     {
-#if NET7_0_OR_GREATER
-        var keys = _keyDictionary.Keys.Order(ConfigurationKey.Comparer).ToList();
-#else
-        var keys = _keyDictionary.Keys.ToList();
-        keys.Sort(ConfigurationKey.Comparer);
-#endif
-        foreach (var key in keys)
+        foreach (var key in _keyDictionary.Keys.Order(ConfigurationKey.Comparer))
             yield return new KeyValuePair<ConfigurationKey, IConfigurationProvider>(key, _keyDictionary[key]);
     }
 
@@ -30,20 +24,11 @@ internal sealed class ConfigurationDictionary : IEnumerable<KeyValuePair<Configu
         return GetEnumerator();
     }
 
-    public IReadOnlyList<ConfigurationKey> GetChildKeys(ConfigurationKey parent)
-    {
-#if NET7_0_OR_GREATER
-        return ChildrenOf(parent)
+    public IReadOnlyList<ConfigurationKey> GetChildKeys(ConfigurationKey parent) =>
+        ChildrenOf(parent)
             .ToHashSet()
             .Order(ConfigurationKey.Comparer)
             .ToList();
-#else
-        var hashSet = new HashSet<ConfigurationKey>(ChildrenOf(parent));
-        var list = hashSet.ToList();
-        list.Sort(ConfigurationKey.Comparer);
-        return list;
-#endif
-    }
 
     private IEnumerable<ConfigurationKey> ChildrenOf(ConfigurationKey parent)
     {

@@ -29,15 +29,8 @@ public static class ConfigurationExtensions
         var root = new JsonObject();
         var queue = new Queue<ConfigurationKey>(new[] { ConfigurationKey.Empty });
 
-#if (!NETSTANDARD2_0)
         while (queue.TryDequeue(out var key))
         {
-#else
-        while (queue.Count > 0)
-        {
-            var key = queue.Dequeue();
-
-#endif
             var name = key.GetKey();
 
             var current = root;

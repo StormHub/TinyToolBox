@@ -2,10 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-
-#if (!NETSTANDARD2_0)
 using Microsoft.AspNetCore.Routing.Patterns;
-#endif
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,7 +35,6 @@ public static class ConfigurationExtensions
         string name)
         where T : IConfigurationProvider => options.AddFormatter<T>(_ => name);
 
-#if (!NETSTANDARD2_0)
     private const string DefaultRoutePattern = "/api/configuration/{*path}";
 
     public static RouteHandlerBuilder MapConfigurationEndpoint(
@@ -63,5 +59,4 @@ public static class ConfigurationExtensions
         [FromRoute] string? path, 
         [FromQuery] string? style, 
         CancellationToken cancellationToken) => httpContext.WriteJsonResponse(path, style, null, cancellationToken);
-#endif
 }
