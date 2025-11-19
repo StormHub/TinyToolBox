@@ -25,15 +25,14 @@ public static class ConfigurationExtensions
         return services;
     }
 
-    public static ConfigurationProviderOptions Map<T>(
-        this ConfigurationProviderOptions options,
-        Func<T, string> formatter)
-        where T : IConfigurationProvider => options.AddFormatter(formatter);
+    extension(ConfigurationProviderOptions options)
+    {
+        public ConfigurationProviderOptions Map<T>(Func<T, string> formatter)
+            where T : IConfigurationProvider => options.AddFormatter(formatter);
 
-    public static ConfigurationProviderOptions Map<T>(
-        this ConfigurationProviderOptions options,
-        string name)
-        where T : IConfigurationProvider => options.AddFormatter<T>(_ => name);
+        public ConfigurationProviderOptions Map<T>(string name)
+            where T : IConfigurationProvider => options.AddFormatter<T>(_ => name);
+    }
 
     private const string DefaultRoutePattern = "/api/configuration/{*path}";
 

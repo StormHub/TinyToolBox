@@ -4,14 +4,11 @@ using Microsoft.Extensions.Configuration;
 
 namespace TinyToolBox.Configuration.Keys;
 
-internal sealed class ConfigurationDictionary : IEnumerable<KeyValuePair<ConfigurationKey, IConfigurationProvider>>
+internal sealed class ConfigurationDictionary(
+    IEnumerable<KeyValuePair<ConfigurationKey, IConfigurationProvider>> keyValuePairs)
+    : IEnumerable<KeyValuePair<ConfigurationKey, IConfigurationProvider>>
 {
-    private readonly ImmutableDictionary<ConfigurationKey, IConfigurationProvider> _keyDictionary;
-
-    public ConfigurationDictionary(IEnumerable<KeyValuePair<ConfigurationKey, IConfigurationProvider>> keyValuePairs)
-    {
-        _keyDictionary = keyValuePairs.ToImmutableDictionary();
-    }
+    private readonly ImmutableDictionary<ConfigurationKey, IConfigurationProvider> _keyDictionary = keyValuePairs.ToImmutableDictionary();
 
     public IEnumerator<KeyValuePair<ConfigurationKey, IConfigurationProvider>> GetEnumerator()
     {

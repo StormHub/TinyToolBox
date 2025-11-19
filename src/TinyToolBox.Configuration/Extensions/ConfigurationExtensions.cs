@@ -7,48 +7,49 @@ namespace TinyToolBox.Configuration.Extensions;
 
 public static class ConfigurationExtensions
 {
-    public static IReadOnlyDictionary<string, string> AsDictionary(
-        this IConfigurationRoot configurationRoot,
-        string[]? segments = null,
-        ConfigurationProviderOptions? options = null)
+    extension(IConfigurationRoot configurationRoot)
     {
-        options ??= new ConfigurationProviderOptions();
-        var configurationDictionary = configurationRoot.AsDictionary(segments, options.Filter);
-
-        return configurationDictionary.ToDictionary(x => x.Key.Path, options.Formatter.Format);
-    }
-
-    public static JsonNode AsJsonNode(
-        this IConfigurationRoot configurationRoot,
-        string[]? segments = null,
-        ConfigurationProviderOptions? options = null)
-    {
-        options ??= new ConfigurationProviderOptions();
-        var configurationDictionary = configurationRoot.AsDictionary(segments, options.Filter);
-
-        var root = new JsonObject();
-        var queue = new Queue<ConfigurationKey>(new[] { ConfigurationKey.Empty });
-
-        while (queue.TryDequeue(out var key))
+        public IReadOnlyDictionary<string, string> AsDictionary(
+            string[]? segments = null,
+            ConfigurationProviderOptions? options = null)
         {
-            var name = key.GetKey();
+            options ??= new ConfigurationProviderOptions();
+            var configurationDictionary = configurationRoot.AsDictionary(segments, options.Filter);
 
-            var current = root;
-            var keys = key.GetSegments();
-            for (var i = 0; i < keys.Length - 1; i++) current = current[keys[i]]!.AsObject();
-
-            var children = configurationDictionary.GetChildKeys(key);
-            if (children.Count == 0)
-            {
-                if (configurationDictionary.TryGetValue(key, out var provider))
-                    current.Add(name, options.Formatter.Format(key, provider!));
-                continue;
-            }
-
-            if (name.Length > 0) current.Add(name, new JsonObject());
-            foreach (var child in children) queue.Enqueue(child);
+            return configurationDictionary.ToDictionary(x => x.Key.Path, options.Formatter.Format);
         }
 
-        return root;
+        public JsonNode AsJsonNode(
+            string[]? segments = null,
+            ConfigurationProviderOptions? options = null)
+        {
+            options ??= new ConfigurationProviderOptions();
+            var configurationDictionary = configurationRoot.AsDictionary(segments, options.Filter);
+
+            var root = new JsonObject();
+            var queue = new Queue<ConfigurationKey>([ConfigurationKey.Empty]);
+
+            while (queue.TryDequeue(out var key))
+            {
+                var name = key.GetKey();
+
+                var current = root;
+                var keys = key.GetSegments();
+                for (var i = 0; i < keys.Length - 1; i++) current = current[keys[i]]!.AsObject();
+
+                var children = configurationDictionary.GetChildKeys(key);
+                if (children.Count == 0)
+                {
+                    if (configurationDictionary.TryGetValue(key, out var provider))
+                        current.Add(name, options.Formatter.Format(key, provider!));
+                    continue;
+                }
+
+                if (name.Length > 0) current.Add(name, new JsonObject());
+                foreach (var child in children) queue.Enqueue(child);
+            }
+
+            return root;
+        }
     }
 }
